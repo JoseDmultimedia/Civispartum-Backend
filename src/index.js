@@ -20,7 +20,7 @@ app.use(express.json()); //Se indica que se va a usar la funcionalidad para mane
 
 //Routes
 
-
+app.use(require('./routes/usuarioData.js'));
 
 //Start Server 
 

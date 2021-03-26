@@ -18,6 +18,8 @@ const connection = mysql.createPool({
     port:3306
 });
 
+// Peticion GET para obtener todos los estudiantes de la bd usuario
+
 router.get('/usuario', (req, res) =>{
     var json1 = {}; //Variable para almacenar cada registro que se lea, en formato json
     var arreglo = []; // Variable para almacenar todos los datos, en formato arreglo json
@@ -45,3 +47,10 @@ connection.getConnection(function(error, tempConn){
     }
 });
 });
+
+// Petecion POST para ingresar estudiantes en la bd usuario
+
+
+
+
+module.exports = router;
