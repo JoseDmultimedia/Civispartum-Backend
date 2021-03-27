@@ -134,7 +134,62 @@ router.post('/usuario/new', async(req, res) =>{
 
 });
 
+//Petición para loguearse en la aplicación atraves de un POST 
 
+router.post('/usuario/login', async (req, res) => {
+    console.log(req.body);
+    json1 = req.body; //Se reciben los datos mandados
+    connection.getConnection(function(error, tempConn){ //Realizar conexion
+        if(error){
+            throw error;
+        }else{
+            console.log('primera conexion');
+            tempConn.query('SELECT * FROM estudiante WHERE nombreEst = ?', [json1.nombreEst], function(error, result){ //Realizar query
+                if(error){
+                    throw error;
+                }else{
+                    tempConn.release(); //Soltar conexion
+                    const cons = result;
+                    if(cons.length === 0){
+                        res.send("No ingresar");
+                    }else{
+                        try{
+                            connection.getConnection(function(error, tempConn){ //Se realiza la conexion con la bd
+                                if(error){
+                                    throw error;
+                                }else{
+                                    console.log('Conexion correcta');
+                                    tempConn.query('SELECT * FROM estudiante WHERE nombreEst = ?', [json1.nombreEst], function(error, result){ //Se realiza el query
+                                        if(error){
+                                            throw error;
+                                        }else{
+                                            tempConn.release(); 
+                                            //console.log(result);
+                                            for(j=0; j<result.length; j++){ //For para obtener el/los datos del query y definir la var
+                                               var obtain = {"nombreEst":result[j].nombreEst, "contrasenaEst":result[j].contrasenaEst};
+                                            }
+                                            const verify = bcrypt.compareSync(json1.contrasenaEst, obtain.contrasenaEst); //Se compara los datos para verificar la contrasena
+                                            if(verify == true){
+                                                res.send("Ingresar");
+                                            }else{
+                                                res.send("No ingresar");
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                
+                        } catch{
+                
+                        }
+                    }
+                }
+            });
+        }
+    });
+});
+
+//
 
 
 module.exports = router;
