@@ -293,7 +293,11 @@ router.get('/usuario/puntaje/suma/:id_PuntajeEst', (req, res) =>{
 });
 
 
-//Peticion POST para ingresar en Foro
+//Peticion POST para ingresar en Foro y comentario_foro
+/* 
+Este realiza un primer query donde inserta foro, luego busca el id de foro, y luego el id del estudiante
+para finalmente ingresarlo en comentario_foro
+*/
 
 router.post('/usuario/foro/new', (req, res) =>{
     //Log de console y llegada de datos almacenados en var json
@@ -309,13 +313,14 @@ router.post('/usuario/foro/new', (req, res) =>{
                     throw error;
                     res.send("Error al ejecutar el query");
                 }else{
-                    tempConn.release(); //Se suelta conexion
+                    //tempConn.release(); //Se suelta conexion
 
                     connection.getConnection(function(error, tempConn){ //Conexion a la bd
                         if(error){
                             throw error;
                         }else{
                             console.log('Conexion correcta');//query abajo
+                            //res.send("Datos Foro Almacenados");
                             tempConn.query('SELECT * FROM (SELECT id_Foro FROM foro WHERE nombreUser = ?) as id_User ORDER BY id_Foro DESC LIMIT 1', [json1.nombreUser], function(error, result){
                                 if(error){
                                     throw error;
@@ -325,130 +330,48 @@ router.post('/usuario/foro/new', (req, res) =>{
                                     for (let index = 0; index < paso.length; index++) {
                                        var respuesta = result[index].id_Foro;
                                     }
-                                    tempConn.release(); //Se suelta conexion
-                                    console.log("Aqui2" + respuesta)
+                                    //tempConn.release(); //Se suelta conexion
                                     pass1 = respuesta;
+                                    console.log('Query 1 realizada');
+                                    tempConn.query('SELECT id_Estudiante FROM estudiante WHERE nombreEst = ?', [json1.nombreUser], function(error, result){
+                                        if(error){
+                                            throw error;
+                                            res.send("Error al ejecutar el query");
+                                        }else{
+                                            var paso = Object.values(result);
+                                            for (let index = 0; index < paso.length; index++) {
+                                                var respuesta = result[index].id_Estudiante;
+                                            }
+                                            //tempConn.release(); //Se suelta conexion
+                                            pass2 = respuesta;
+                                            console.log('Query 2 Realizada');
+                                            connection.getConnection(function(error, tempConn){
+                                                if(error){
+                                                    throw error;
+                                                }else{
+                                                    tempConn.query('INSERT INTO comentario_foro VALUES (NULL, ?, ?)', [pass1, pass2], function(error, result){
+                                                        if(error){
+                                                            throw error;
+                                                        }else{
+                                                            tempConn.release();
+                                                            res.send("Todos los datos almacenados");
+                                                            console.log('Insert comentario_foro');
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    });
                                 }
                             });
                         }
                     });
-
-                    connection.getConnection(function(error, tempConn){ //Conexion a la bd
-                        if(error){
-                            throw error;
-                        }else{
-                            console.log('Conexion correcta');//query abajo
-                            tempConn.query('SELECT id_Estudiante FROM estudiante WHERE nombreEst = ?', [json1.nombreUser], function(error, result){
-                                if(error){
-                                    throw error;
-                                    res.send("Error al ejecutar el query");
-                                }else{
-                                    var paso = Object.values(result);
-                                    for (let index = 0; index < paso.length; index++) {
-                                        var respuesta = result[index].id_Estudiante;
-                                    }
-                                    tempConn.release(); //Se suelta conexion
-                                    
-                                    pass2 = respuesta;
-                                    
-                                }
-                            });
-                        }
-                    });
-
-                    connection.getConnection(function(error, tempConn){
-                        if(error){
-                            throw error;
-                        }else{
-                            tempConn.query('INSERT INTO comentario_foro VALUES (NULL, ?, ?)', [pass1, pass2], function(error, result){
-                                if(error){
-                                    throw error;
-                                }else{
-                                    tempConn.release();
-                                    res.send("Datos almacenados");
-                                }
-                            });
-                        }
-                    });
-
-
                 }
             });
         }
     });
 });
 
-/*
-function getIdEstudiante(name){
-    connection.getConnection(function(error, tempConn){ //Conexion a la bd
-        if(error){
-            throw error;
-        }else{
-            console.log('Conexion correcta');//query abajo
-            tempConn.query('SELECT id_Estudiante FROM estudiante WHERE nombreEst = ?', [name], function(error, result){
-                if(error){
-                    throw error;
-                    res.send("Error al ejecutar el query");
-                }else{
-                    var paso = Object.values(result);
-                    for (let index = 0; index < paso.length; index++) {
-                        respuesta = result[index].id_Estudiante;
-                    }
-                    tempConn.release(); //Se suelta conexion
-                    
-                    pass = parseInt(respuesta);
 
-                    console.log("Aqui1" + pass)
-                    return pass;
-                }
-            });
-        }
-    });
-
-}
-
-function getIdForo(name){
-    connection.getConnection(function(error, tempConn){ //Conexion a la bd
-        if(error){
-            throw error;
-        }else{
-            console.log('Conexion correcta');//query abajo
-            tempConn.query('SELECT * FROM (SELECT id_Foro FROM foro WHERE nombreUser = ?) as id_User ORDER BY id_Foro DESC LIMIT 1', [name], function(error, result){
-                if(error){
-                    throw error;
-                    res.send("Error al ejecutar el query");
-                }else{
-                    var paso = Object.values(result);
-                    for (let index = 0; index < paso.length; index++) {
-                        respuesta = result[index].id_Foro;
-                    }
-                    tempConn.release(); //Se suelta conexion
-                    console.log("Aqui2" + respuesta)
-                    pass = parseInt(respuesta);
-                    return pass;
-                }
-            });
-        }
-    });
-
-}
-
-function insertComentForo (id1, id2){
-    connection.getConnection(function(error, tempConn){
-        if(error){
-            throw error;
-        }else{
-            tempConn.query('INSERT INTO comentario_foro VALUES (NULL, ?, ?)', [id1, id2], function(error, result){
-                if(error){
-                    throw error;
-                }else{
-                    tempConn.release();
-                    res.send("Datos almacenados");
-                }
-            });
-        }
-    });
-}
-*/
 
 module.exports = router;
