@@ -189,7 +189,110 @@ router.post('/usuario/login', async (req, res) => {
     });
 });
 
-//
+//Peticion POST para añadir un nuevo registro en la bd usuario bajo la tabla registro
 
+router.post('/usuario/registro/new', (req, res) =>{
+    //Log en consola y almacenamiento de datos en variable json
+    console.log(req.body);
+    json1 = req.body;
+    connection.getConnection(function(error, tempConn){ //Se realiza la conexion
+        if(error){
+            throw error;
+        }else{ //Query
+            console.log('Conexion correcta');
+            tempConn.query('INSERT INTO registro VALUES (NULL, ?, ?, ?)', [json1.fechaRegistro, json1.actividad, json1.id_RegistroEst], function(error, result){
+                if(error){
+                    throw error;
+                    res.send("Error al ejecutar el query");
+                }else{
+                    tempConn.release(); // Se suelta la conexion
+                    res.send("Datos almacenados");
+                }
+            });
+        }
+    });
+});
+
+//Peticion GET para consultar los registros de un usuario
+
+router.get('/usuario/registro/:id_RegistroEst', (req, res) =>{
+    var json1 = {}; //Variable para almacenar cada json de datos 
+    var arreglo = []; //Variable para llenar el arreglo de json a los multiples datos
+    var id = req.params.id_RegistroEst; //Se obtiene la variable recibida a trves de url
+
+    connection.getConnection(function(error, tempConn){ //Se realiza la conection a la bd
+        if(error){
+            throw error;
+        }else{
+            console.log('Conexion correcta');
+            tempConn.query('SELECT * FROM registro WHERE id_RegistroEst = ?', [id], function(error, result){ //Se realiza query
+                var registro = result; //Se almacena los datos en variable regisstro
+                if(error){
+                    throw error;
+                }else{
+                    tempConn.release(); //Se suelta la conexion a la bd 
+                    for(j=0; j<registro.length;j++){
+                        json1 = {"fechaRegistro": registro[j].fechaRegistro, "actividad":registro[j].actividad, "id_RegistroEst":registro[j].id_RegistroEst};
+                        arreglo.push(json1); //Se organizan los datos y se pushean al arreglo
+                    }
+                    res.send(arreglo);//Se envia el arreglo como respuesta
+                }
+            });
+        }
+    });
+});
+
+
+//Peticion POST para añadir un puntaje 
+
+router.post('/usuario/puntaje/new', (req, res) =>{
+    //Log de console y llegada de datos almacenados en var json
+    console.log(req.body);
+    json1 = req.body;
+    connection.getConnection(function(error, tempConn){ //Conexion a la bd
+        if(error){
+            throw error;
+        }else{
+            console.log('Conexion correcta');//query abajo
+            tempConn.query('INSERT INTO puntaje VALUES (NULL, ?, ?, ?)', [json1.puntaje, json1.descripcionPuntaje, json1.id_PuntajeEst], function(error, result){
+                if(error){
+                    throw error;
+                    res.send("Error al ejecutar el query");
+                }else{
+                    tempConn.release(); //Se suelta conexion
+                    res.send("Datos almacenados");
+                }
+            });
+        }
+    });
+});
+
+
+//Peticion GET para obtener la suma de los puntajes de un usuario
+
+router.get('/usuario/puntaje/suma/:id_PuntajeEst', (req, res) =>{
+
+    var id = req.params.id_PuntajeEst; //Se recibe la varible mandada en la url
+
+    connection.getConnection(function(error, tempConn){ //Se realiza la conexion a la bd
+        if(error){
+            throw error;
+        }else{
+            console.log('Conexion realizada');
+            tempConn.query('SELECT SUM(puntaje) FROM puntaje WHERE id_PuntajeEst = ? ', [id], function(error, result){ //Se realiza query
+                if(error){
+                    throw error;
+                }else{
+                    tempConn.release(); //Se suelta la conexion
+                    var sum = result;
+                    res.send(sum);// Se envia el dato obtenido
+                }
+            });
+        }
+    });
+});
+
+
+//
 
 module.exports = router;
