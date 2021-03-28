@@ -19,8 +19,10 @@ app.use(express.json()); //Se indica que se va a usar la funcionalidad para mane
 
 
 //Routes
-
+//Rutas para post y get en bd usuario
 app.use(require('./routes/usuarioData.js'));
+//Rutas para post y get en bd usuario
+app.use(require('./routes/audiovisualData.js'));
 
 //Start Server 
 
