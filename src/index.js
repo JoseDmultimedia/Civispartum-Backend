@@ -9,7 +9,7 @@ const morgan = require('morgan'); //Se indica que se requiere morgan
 
 //Settings 
 
-app.set('port', 3000); //Se define el puerto por el cual va a funcionar el servicio
+app.set('port', 8080); //Se define el puerto por el cual va a funcionar el servicio
 
 
 //Utilities
