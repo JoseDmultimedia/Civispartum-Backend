@@ -151,7 +151,7 @@ router.post('/usuario/login', async (req, res) => {
                     tempConn.release(); //Soltar conexion
                     const cons = result;
                     if(cons.length === 0){
-                        res.send("No ingresar");
+                        res.send("No ingresar, Usuario no encontrado");
                     }else{
                         try{
                             connection.getConnection(function(error, tempConn){ //Se realiza la conexion con la bd
@@ -171,11 +171,11 @@ router.post('/usuario/login', async (req, res) => {
                                             const verify = bcrypt.compareSync(json1.contrasenaEst, obtain.contrasenaEst); //Se compara los datos para verificar la contrasena
                                             if(verify == true){
                                                 res.status(200);
-                                                res.send("Ingresar");
+                                                res.send("Ingresa Ok");
                                                 console.log('Ingreso');
                                             }else{
                                                 //res.status(403);
-                                                res.send("No ingresar");
+                                                res.send("No ingresar constraseña invalidad");
                                                 console.log('NoIngreso');
                                             }
                                         }
