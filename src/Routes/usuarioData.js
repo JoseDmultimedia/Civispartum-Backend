@@ -170,9 +170,13 @@ router.post('/usuario/login', async (req, res) => {
                                             }
                                             const verify = bcrypt.compareSync(json1.contrasenaEst, obtain.contrasenaEst); //Se compara los datos para verificar la contrasena
                                             if(verify == true){
+                                                res.status(200);
                                                 res.send("Ingresar");
+                                                console.log('Ingreso');
                                             }else{
+                                                //res.status(403);
                                                 res.send("No ingresar");
+                                                console.log('NoIngreso');
                                             }
                                         }
                                     });
