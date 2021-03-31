@@ -175,7 +175,7 @@ router.post('/usuario/login', async (req, res) => {
                                                 console.log('Ingreso');
                                             }else{
                                                 //res.status(403);
-                                                res.send("Noingresar constraseña invalidad");
+                                                res.send("Noingresar constraseña invalida");
                                                 console.log('NoIngreso');
                                             }
                                         }
