@@ -116,7 +116,7 @@ router.post('/usuario/new', async(req, res) =>{
                                         res.send("Error al ejecutar el query");
                                     }else{
                                         tempConn.release();
-                                        res.send("Datos almacenados");
+                                        res.send("Almacenado");
                                     }
                                 });
                             }
