@@ -78,30 +78,26 @@ router.post('/usuario/new', async(req, res) =>{
     try{
         const hashedPassword = await bcrypt.hash(req.body.contrasenaEst,10); //Se recibe la contraseña y se encrypta usando bcrypt
         console.log(req.body); //Se muestran datos en consola 
-        json1 = req.body; // Se alamacenan datos en variable json1
-        
+        var json1 = req.body; // Se alamacenan datos en variable json1
+
         connection.getConnection(function(error, tempConn){//Se realiza la conexión a la bd 
             if(error){
                 throw error;
             }else{
                 console.log('Primera conexión'); 
                 tempConn.query('SELECT * FROM estudiante WHERE nombreEst = ?', [json1.nombreEst], function(error, result){  //Se realiza query para verificar repitencia en el nombre
-                    for(j=0; j<result.length; j++){ //For para obtener el/los datos del query y definir la var
-                        obtain = {"nombreEst":result[j].nombreEst};
-                    }
-                    var compare = obtain.nombreEst == json1.nombreEst ? true : false; //Comparacon de datos del query y dato mandando por post
-                    /*
-                    console.log(obtain.nombreEst);
-                    console.log(json1.nombreEst); Verificación de datos en Dev 
-                    console.log(compare);
-                    */
+                    
+                    var resultado = result;
+                    console.log(resultado.length);
+                    var paso = resultado.length == 0 ? false : true; 
+
                     if(error){
                         throw error;
                         res.send("Error al ejecutar el query");
                     }else{
                         tempConn.release(); //Se desconecta la bd para el primer query
 
-                        if(compare == true ){ //Condicional que recibe el dato de comparte que verifica que el nombre no sea igual
+                        if(paso == true ){ //Condicional que recibe el dato de comparte que verifica que el nombre no sea igual
                             res.send("Nombre de usuario ultilizado cambia el usuario");
                         }else{
 
@@ -116,20 +112,20 @@ router.post('/usuario/new', async(req, res) =>{
                                         res.send("Error al ejecutar el query");
                                     }else{
                                         tempConn.release();
-                                        res.send("Almacenado");
+                                        res.send("Ok");
                                     }
                                 });
                             }
                         });
-                        
+
                         }
                     }
                 } );
             }
         });
-    
+
     }catch{
-      
+
     }
 
 });
