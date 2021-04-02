@@ -215,24 +215,24 @@ router.post('/usuario/registro/new', (req, res) =>{
 
 //Peticion GET para consultar los registros de un usuario
 
-router.get('/usuario/registro/:id_RegistroEst', (req, res) =>{
+router.get('/usuario/registro/:nombreEst', (req, res) =>{
     var json1 = {}; //Variable para almacenar cada json de datos 
     var arreglo = []; //Variable para llenar el arreglo de json a los multiples datos
-    var id = req.params.id_RegistroEst; //Se obtiene la variable recibida a trves de url
+    var id = req.params.nombreEst; //Se obtiene la variable recibida a trves de url
 
     connection.getConnection(function(error, tempConn){ //Se realiza la conection a la bd
         if(error){
             throw error;
         }else{
             console.log('Conexion correcta');
-            tempConn.query('SELECT * FROM registro WHERE id_RegistroEst = ?', [id], function(error, result){ //Se realiza query
+            tempConn.query('SELECT fechaRegistro, actividad FROM registro r, estudiante e WHERE e.id_Estudiante=r.id_RegistroEst AND e.nombreEst = ?', [id], function(error, result){ //Se realiza query
                 var registro = result; //Se almacena los datos en variable regisstro
                 if(error){
                     throw error;
                 }else{
                     tempConn.release(); //Se suelta la conexion a la bd 
                     for(j=0; j<registro.length;j++){
-                        json1 = {"fechaRegistro": registro[j].fechaRegistro, "actividad":registro[j].actividad, "id_RegistroEst":registro[j].id_RegistroEst};
+                        json1 = {"fechaRegistro": registro[j].fechaRegistro, "actividad":registro[j].actividad};
                         arreglo.push(json1); //Se organizan los datos y se pushean al arreglo
                     }
                     res.send(arreglo);//Se envia el arreglo como respuesta
@@ -265,6 +265,7 @@ router.get('/usuario/registro/ultimo/:nombreEst', (req, res) =>{
                         arreglo.push(json1); //Se organizan los datos y se pushean al arreglo
                     }
                     res.send(arreglo);//Se envia el arreglo como respuesta
+                    console.log(arreglo);
                 }
             });
         }
