@@ -242,6 +242,35 @@ router.get('/usuario/registro/:id_RegistroEst', (req, res) =>{
     });
 });
 
+//Peticion GET para consultar el ultimo registro de un usuario
+
+router.get('/usuario/registro/ultimo/:nombreEst', (req, res) =>{
+    var json1 = {}; //Variable para almacenar cada json de datos 
+    var arreglo = []; //Variable para llenar el arreglo de json a los multiples datos
+    var id = req.params.nombreEst; //Se obtiene la variable recibida a trves de url
+
+    connection.getConnection(function(error, tempConn){ //Se realiza la conection a la bd
+        if(error){
+            throw error;
+        }else{
+            console.log('Conexion correcta');
+            tempConn.query('SELECT fechaRegistro, actividad FROM registro r, estudiante e WHERE e.id_Estudiante=r.id_RegistroEst and e.nombreEst= ? ORDER BY r.id_RegistroEst DESC LIMIT 1', [id], function(error, result){ //Se realiza query
+                var registro = result; //Se almacena los datos en variable regisstro
+                if(error){
+                    throw error;
+                }else{
+                    tempConn.release(); //Se suelta la conexion a la bd 
+                    for(j=0; j<registro.length;j++){
+                        json1 = {"fechaRegistro": registro[j].fechaRegistro, "actividad":registro[j].actividad};
+                        arreglo.push(json1); //Se organizan los datos y se pushean al arreglo
+                    }
+                    res.send(arreglo);//Se envia el arreglo como respuesta
+                }
+            });
+        }
+    });
+});
+
 
 //Peticion POST para añadir un puntaje 
 
@@ -307,6 +336,7 @@ router.get('/usuario/puntaje/:nombreEst', (req, res) =>{
             console.log('Conexion correcta');
             tempConn.query('SELECT puntaje, descripcionPuntaje FROM puntaje p, estudiante e WHERE e.id_Estudiante=p.id_PuntajeEst and e.nombreEst = ?', [id], function(error, result){ //Se realiza query
                 var puntaje = result; //Se almacena los datos en variable regisstro
+                console.log(puntaje);
                 if(error){
                     throw error;
                 }else{
@@ -315,7 +345,9 @@ router.get('/usuario/puntaje/:nombreEst', (req, res) =>{
                         json1 = {"puntaje":puntaje[j].puntaje, "descripcionPuntaje":puntaje[j].descripcionPuntaje};
                         arreglo.push(json1); //Se organizan los datos y se pushean al arreglo
                     }
+                    console.log(arreglo);
                     res.send(arreglo);//Se envia el arreglo como respuesta
+                    
                 }
             });
         }
