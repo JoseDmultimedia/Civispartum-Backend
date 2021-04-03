@@ -98,7 +98,7 @@ router.post('/usuario/new', async(req, res) =>{
                         tempConn.release(); //Se desconecta la bd para el primer query
 
                         if(paso == true ){ //Condicional que recibe el dato de comparte que verifica que el nombre no sea igual
-                            res.send("Nombre de usuario ultilizado cambia el usuario");
+                            res.send("Nombre de usuario ultilizado, cambia el nombre");
                         }else{
 
                         connection.getConnection(function(error, tempConn){ //Se realiza otra vez la conexion a la base de datos
@@ -147,7 +147,7 @@ router.post('/usuario/login', async (req, res) => {
                     tempConn.release(); //Soltar conexion
                     const cons = result;
                     if(cons.length === 0){
-                        res.send("No ingresar, Usuario no encontrado");
+                        res.send("Usuario no encontrado");
                     }else{
                         try{
                             connection.getConnection(function(error, tempConn){ //Se realiza la conexion con la bd
@@ -171,7 +171,7 @@ router.post('/usuario/login', async (req, res) => {
                                                 console.log('Ingreso');
                                             }else{
                                                 //res.status(403);
-                                                res.send("Noingresar constraseña invalida");
+                                                res.send("Constraseña invalida");
                                                 console.log('NoIngreso');
                                             }
                                         }
@@ -190,6 +190,7 @@ router.post('/usuario/login', async (req, res) => {
 });
 
 //Peticion POST para añadir un nuevo registro en la bd usuario bajo la tabla registro
+    
 
 router.post('/usuario/registro/new', (req, res) =>{
     //Log en consola y almacenamiento de datos en variable json
@@ -200,13 +201,33 @@ router.post('/usuario/registro/new', (req, res) =>{
             throw error;
         }else{ //Query
             console.log('Conexion correcta');
-            tempConn.query('INSERT INTO registro VALUES (NULL, ?, ?, ?)', [json1.fechaRegistro, json1.actividad, json1.id_RegistroEst], function(error, result){
+            tempConn.query('SELECT id_Estudiante FROM estudiante WHERE nombreEst = ?', [json1.nombreEst], function(error, result){
                 if(error){
                     throw error;
                     res.send("Error al ejecutar el query");
                 }else{
                     tempConn.release(); // Se suelta la conexion
-                    res.send("Datos almacenados");
+                    var paso = Object.values(result);
+                    for (let index = 0; index < paso.length; index++) {
+                             var respuesta = result[index].id_Estudiante;
+                        }
+                    console.log(respuesta);
+                    connection.getConnection(function(error, tempConn){ //Se realiza la conexion
+                        if(error){
+                            throw error;
+                        }else{ //Query
+                            console.log('Conexion correcta');
+                            tempConn.query('INSERT INTO registro VALUES (NULL, ?, ?, ?)', [json1.fechaRegistro, json1.actividad, respuesta], function(error, result){
+                                if(error){
+                                    throw error;
+                                    res.send("Error al ejecutar el query");
+                                }else{
+                                    tempConn.release(); // Se suelta la conexion
+                                    res.send("Ok");
+                                }
+                            });
+                        }
+                    });
                 }
             });
         }
@@ -276,6 +297,7 @@ router.get('/usuario/registro/ultimo/:nombreEst', (req, res) =>{
 //Peticion POST para añadir un puntaje 
 
 router.post('/usuario/puntaje/new', (req, res) =>{
+
     //Log de console y llegada de datos almacenados en var json
     console.log(req.body);
     json1 = req.body;
@@ -284,13 +306,33 @@ router.post('/usuario/puntaje/new', (req, res) =>{
             throw error;
         }else{
             console.log('Conexion correcta');//query abajo
-            tempConn.query('INSERT INTO puntaje VALUES (NULL, ?, ?, ?)', [json1.puntaje, json1.descripcionPuntaje, json1.id_PuntajeEst], function(error, result){
+            tempConn.query('SELECT id_Estudiante FROM estudiante WHERE nombreEst = ?', [json1.nombreEst], function(error, result){
                 if(error){
                     throw error;
                     res.send("Error al ejecutar el query");
                 }else{
                     tempConn.release(); //Se suelta conexion
-                    res.send("Datos almacenados");
+                    var paso = Object.values(result);
+                    for (let index = 0; index < paso.length; index++) {
+                             var respuesta = result[index].id_Estudiante;
+                        }
+                    console.log(respuesta);
+                    connection.getConnection(function(error, tempConn){ //Conexion a la bd
+                        if(error){
+                            throw error;
+                        }else{
+                            console.log('Conexion correcta');//query abajo
+                            tempConn.query('INSERT INTO puntaje VALUES (NULL, ?, ?, ?)', [json1.puntaje, json1.descripcionPuntaje, respuesta], function(error, result){
+                                if(error){
+                                    throw error;
+                                    res.send("Error al ejecutar el query");
+                                }else{
+                                    tempConn.release(); //Se suelta conexion
+                                    res.send("Ok");
+                                }
+                            });
+                        }
+                    });
                 }
             });
         }
