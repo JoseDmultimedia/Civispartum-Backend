@@ -59,7 +59,7 @@ router.post('/usuario',(req, res) =>{
                 throw error;// En caso de error en la conexión
             } else{
                 console.log('conexión correcta');
-                tempConn.query('INSERT INTO estudiante VALUES (?, ?, ?, null, null)', [json1.nombreEst, json1.correoEst, json1.contrasenaEst], function(error, result){
+                tempConn.query('INSERT INTO estudiante VALUES (null, ?, ?, null, ?)', [json1.nombreEst, json1.correoEst, json1.contrasenaEst], function(error, result){
                     if (error){
                         throw error;
                         res.send("Error la ejecutar el query");
@@ -106,7 +106,7 @@ router.post('/usuario/new', async(req, res) =>{
                                 throw error;
                             }else{
                                 console.log('conexion correcta');
-                                tempConn.query('INSERT INTO estudiante VALUES(?, ?, ?, NULL, NULL)',[json1.nombreEst, json1.correoEst, hashedPassword], function(error, result){
+                                tempConn.query('INSERT INTO estudiante VALUES(NULL, ?, ?, NULL, ?)',[json1.nombreEst, json1.correoEst, hashedPassword], function(error, result){
                                     if(error){
                                         throw error;
                                         res.send("Error al ejecutar el query");
@@ -414,7 +414,7 @@ router.post('/usuario/foro/new', (req, res) =>{
             throw error;
         }else{
             console.log('Conexion correcta');//query abajo
-            tempConn.query('INSERT INTO foro VALUES (NULL, ?, ?, ?)', [json1.comentario, json1.numeroLikes, json1.nombreUser], function(error, result){
+            tempConn.query('INSERT INTO foro VALUES (NULL, ?, ?, ?)', [json1.comentario,  json1.nombreUser, json1.numeroLikes], function(error, result){
                 if(error){
                     throw error;
                     res.send("Error al ejecutar el query");
