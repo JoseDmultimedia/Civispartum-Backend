@@ -38,7 +38,7 @@ connection.getConnection(function(error, tempConn){
             } else{
                 tempConn.release(); //Se libera la conexion
                 for(i=0; i<resultado.length; i++){
-                    json1 = {"id_Estudiante":resultado[i].id_Estudiante,"nombreEst":resultado[i].nombreEst, "correoEst":resultado[i].correoEst, "contrasenaEst":resultado[i].contrasenaEst, "fotoEst":resultado[i]};
+                    json1 = {"id_Estudiante":resultado[i].id_Estudiante,"nombreEst":resultado[i].nombreEst, "correoEst":resultado[i].correoEst, "fotoEst":resultado[i], "contrasenaEst":resultado[i].contrasenaEst};
                     console.log(json1); //Se muestra en consola el json
                     arreglo.push(json1); //Se añade el json al arreglo
                 }
