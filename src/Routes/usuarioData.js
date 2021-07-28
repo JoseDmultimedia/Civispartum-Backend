@@ -211,7 +211,7 @@ router.post('/usuario/registro/new', (req, res) =>{
                     for (let index = 0; index < paso.length; index++) {
                              var respuesta = result[index].id_Estudiante;
                         }
-                    console.log(respuesta);
+                    //console.log(respuesta);
                     connection.getConnection(function(error, tempConn){ //Se realiza la conexion
                         if(error){
                             throw error;
@@ -294,6 +294,36 @@ router.get('/usuario/registro/ultimo/:nombreEst', (req, res) =>{
 });
 
 
+//Peticion GET para consultar los ultimos tres registros de un usuario
+
+router.get('/usuario/registro/tres/:nombreEst', (req, res) =>{
+    var json1 = {}; //Variable para almacenar cada json de datos 
+    var arreglo = []; //Variable para llenar el arreglo de json a los multiples datos
+    var id = req.params.nombreEst; //Se obtiene la variable recibida a trves de url
+
+    connection.getConnection(function(error, tempConn){ //Se realiza la conection a la bd
+        if(error){
+            throw error;
+        }else{
+            console.log('Conexion correcta');
+            tempConn.query('SELECT id_Registro, fechaRegistro, actividad FROM registro r, estudiante e WHERE e.id_Estudiante=r.id_RegistroEst and e.nombreEst= ? ORDER BY r.id_Registro DESC LIMIT 3', [id], function(error, result){ //Se realiza query
+                var registro = result; //Se almacena los datos en variable regisstro
+                if(error){
+                    throw error;
+                }else{
+                    tempConn.release(); //Se suelta la conexion a la bd 
+                    for(j=0; j<registro.length;j++){
+                        json1 = {"id_Registro": registro[j].id_Registro, "fechaRegistro": registro[j].fechaRegistro, "actividad":registro[j].actividad};
+                        arreglo.push(json1); //Se organizan los datos y se pushean al arreglo
+                    }
+                    res.send(arreglo);//Se envia el arreglo como respuesta
+                    console.log(arreglo);
+                }
+            });
+        }
+    });
+});
+
 //Peticion POST para añadir un puntaje 
 
 router.post('/usuario/puntaje/new', (req, res) =>{
@@ -316,7 +346,7 @@ router.post('/usuario/puntaje/new', (req, res) =>{
                     for (let index = 0; index < paso.length; index++) {
                              var respuesta = result[index].id_Estudiante;
                         }
-                    console.log(respuesta);
+                    //console.log(respuesta);
                     connection.getConnection(function(error, tempConn){ //Conexion a la bd
                         if(error){
                             throw error;
@@ -460,6 +490,7 @@ router.post('/usuario/foro/new', (req, res) =>{
                                                             throw error;
                                                         }else{
                                                             tempConn.release();
+                                                            res.status(200);
                                                             res.send("Ok");
                                                             console.log('Insert comentario_foro');
                                                         }
@@ -536,6 +567,164 @@ connection.getConnection(function(error, tempConn){
         });
     }
 });
+});
+
+
+router.get('/usuario/primer/premio/:nombreEst', (req, res) => {
+    var json1 = {};
+    var arreglo = [];
+    var id = req.params.nombreEst;
+    var pre1 = false;
+    var pre2 = false;
+    var pre3 = false;
+    var premio = 0;
+    var contador1 = 0;
+    var contador2 = 0;
+    var contador3 = 0;
+
+connection.getConnection(function(error, tempConn){
+    if (error){
+        throw error;
+    }else{
+        console.log("Conexión Correcta");
+        tempConn.query('SELECT * FROM puntaje p, estudiante e WHERE e.id_Estudiante = p.id_PuntajeEst and e.nombreEst = ?',[id], function(error, result){
+            var resultado = result;
+            if(error){
+                throw error;
+                res.send("error en la ejecucion del query");
+            } else{
+                tempConn.release(); //Se libera la conexion
+                for(i=0; i<resultado.length; i++){
+                    json1 = {"descripcionPuntaje":resultado[i].descripcionPuntaje};
+                    //console.log(json1); //Se muestra en consola el json
+                    arreglo.push(json1); //Se añade el json al arreglo
+                }
+                for(j=0; j<arreglo.length; j++){
+                    if(arreglo[j].descripcionPuntaje === 'Pregunta 1 Voto'){
+                        contador1+= 1;
+                    }
+                    if(arreglo[j].descripcionPuntaje === 'Pregunta 2 Voto'){
+                        contador2+= 1;
+                    }
+                    if(arreglo[j].descripcionPuntaje === 'Pregunta 3 Voto'){
+                        contador3+= 1;
+                    }
+                }
+                //console.log(contador1, contador2, contador3);
+
+                pre1 = contador1 > 0 ? true : false; 
+                pre2 = contador2 > 0 ? true : false; 
+                pre3 = contador3 > 0 ? true : false; 
+
+                //console.log(pre1, pre2, pre3);
+
+                if(pre1 === true){
+                    premio = 33;
+                }
+                if(pre1 === true && pre2 === true){
+                    premio = 66;
+                }
+                if(pre1 === true && pre2 === true && pre3 === true){
+                    premio = 100;
+                }
+                
+                /*
+                premio = pre1 === true ? 33 : 0;
+                Premio = pre1 === true && pre2 === true ? 66 : 0;
+                premio = pre1 === true && pre2 === true && pre3 === true ? 100 : 0;
+                */
+
+                res.json(premio); //Se retorna la respuesta
+            }
+        })
+    }
+})
+});
+
+router.get('/usuario/segundo/premio/:nombreEst', (req, res) => {
+    var json1 = {};
+    var arreglo = [];
+    var id = req.params.nombreEst;
+    var pre1 = false;
+    var pre2 = false;
+    var pre3 = false;
+    var pre4 = false;
+    var pre5 = false;
+    var pre6 = false;
+    var pre7 = false;
+    var premio = 0;
+    var contador1 = 0;
+    var contador2 = 0;
+    var contador3 = 0;
+    var contador4 = 0;
+    var contador5 = 0;
+    var contador6 = 0;
+    var contador7 = 0;
+
+connection.getConnection(function(error, tempConn){
+    if (error){
+        throw error;
+    }else{
+        console.log("Conexión Correcta");
+        tempConn.query('SELECT * FROM puntaje p, estudiante e WHERE e.id_Estudiante = p.id_PuntajeEst and e.nombreEst = ?',[id], function(error, result){
+            var resultado = result;
+            if(error){
+                throw error;
+                res.send("error en la ejecucion del query");
+            } else{
+                tempConn.release(); //Se libera la conexion
+                for(i=0; i<resultado.length; i++){
+                    json1 = {"descripcionPuntaje":resultado[i].descripcionPuntaje};
+                    //console.log(json1); //Se muestra en consola el json
+                    arreglo.push(json1); //Se añade el json al arreglo
+                }
+                for(j=0; j<arreglo.length; j++){
+                    if(arreglo[j].descripcionPuntaje === 'Pregunta 1 Voto'){
+                        contador1+= 1;
+                    }
+                    if(arreglo[j].descripcionPuntaje === 'Pregunta 2 Voto'){
+                        contador2+= 1;
+                    }
+                    if(arreglo[j].descripcionPuntaje === 'Pregunta 3 Voto'){
+                        contador3+= 1;
+                    }
+                    if(arreglo[j].descripcionPuntaje === 'Pregunta 1 Referendo'){
+                        contador4+= 1;
+                    }
+                    if(arreglo[j].descripcionPuntaje === 'Pregunta 2 Referendo'){
+                        contador5+= 1;
+                    }
+                    if(arreglo[j].descripcionPuntaje === 'Pregunta 3 Referendo'){
+                        contador6+= 1;
+                    }
+                    if(arreglo[j].descripcionPuntaje === 'Pregunta 4 Referendo'){
+                        contador7+= 1;
+                    }
+                }
+                //console.log(contador1, contador2, contador3);
+
+                pre1 = contador1 > 0 ? true : false; 
+                pre2 = contador2 > 0 ? true : false; 
+                pre3 = contador3 > 0 ? true : false; 
+                pre4 = contador4 > 0 ? true : false; 
+                pre5 = contador5 > 0 ? true : false; 
+                pre6 = contador6 > 0 ? true : false; 
+                pre7 = contador7 > 0 ? true : false; 
+
+                //console.log(pre1, pre2, pre3);
+
+                if(pre1 === true && pre2 === true && pre3 === true){
+                    premio = 50;
+                }
+                if(pre1 === true && pre2 === true && pre3 === true && pre4 === true && pre5 === true && pre6 === true && pre7 === true  ){
+                    premio = 100;
+                }
+
+                res.json(premio); //Se retorna la respuesta
+            }
+        })
+    }
+})
 });
 
 
