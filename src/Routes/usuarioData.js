@@ -577,10 +577,12 @@ router.get('/usuario/primer/premio/:nombreEst', (req, res) => {
     var pre1 = false;
     var pre2 = false;
     var pre3 = false;
+    var pre4 = false;
     var premio = 0;
     var contador1 = 0;
     var contador2 = 0;
     var contador3 = 0;
+    var contador4 = 0;
 
 connection.getConnection(function(error, tempConn){
     if (error){
@@ -600,14 +602,17 @@ connection.getConnection(function(error, tempConn){
                     arreglo.push(json1); //Se añade el json al arreglo
                 }
                 for(j=0; j<arreglo.length; j++){
-                    if(arreglo[j].descripcionPuntaje === 'Pregunta 1 Voto'){
+                    if(arreglo[j].descripcionPuntaje === 'Pregunta 1 Referendo'){
                         contador1+= 1;
                     }
-                    if(arreglo[j].descripcionPuntaje === 'Pregunta 2 Voto'){
+                    if(arreglo[j].descripcionPuntaje === 'Pregunta 2 Referendo'){
                         contador2+= 1;
                     }
-                    if(arreglo[j].descripcionPuntaje === 'Pregunta 3 Voto'){
+                    if(arreglo[j].descripcionPuntaje === 'Pregunta 3 Referendo'){
                         contador3+= 1;
+                    }
+                    if(arreglo[j].descripcionPuntaje === 'Pregunta 4 Referendo'){
+                        contador4+= 1;
                     }
                 }
                 //console.log(contador1, contador2, contador3);
@@ -615,16 +620,22 @@ connection.getConnection(function(error, tempConn){
                 pre1 = contador1 > 0 ? true : false; 
                 pre2 = contador2 > 0 ? true : false; 
                 pre3 = contador3 > 0 ? true : false; 
-
+                pre4 = contador4 > 0 ? true : false; 
                 //console.log(pre1, pre2, pre3);
 
-                if(pre1 === true){
-                    premio = 33;
+                if(pre1 === true || pre2 === true || pre3 === true){
+                    premio = 25;
                 }
-                if(pre1 === true && pre2 === true){
-                    premio = 66;
+
+                if((pre1 === true && pre2 === true) || (pre1 === true && pre3 == true) || (pre2 === true && pre3 ===true)){
+                    premio = 50;
                 }
+
                 if(pre1 === true && pre2 === true && pre3 === true){
+                    premio = 75;
+                }
+                
+                if(pre1 === true && pre2 === true && pre3 === true && pre4 === true){
                     premio = 100;
                 }
                 
